@@ -10,3 +10,8 @@ service-account*.json
 node_modules/
 .DS_Store
 submission/video/work/
+.deploy-project
+# 提出用のバイナリ（画像・動画）はZennに直接アップロードする。リポジトリには含めない
+submission/video/
+submission/screenshots*/
+submission/diagram/*.png

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIの使い方を教えます</title>
+<meta name="description" content="AIを初めて使う人のための、対話式の練習アプリ。自分の「やりたいこと」で、指示文の書き方を練習できます。">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <h1>AIの使い方を教えます</h1>
+    <p class="sub">やりたいことを1行書くだけ。AIの先生が、書き方の練習につきあいます。</p>
+    <ol class="steps" id="steps" aria-label="進み具合">
+      <li data-step="1" class="on">目的</li><li data-step="2">スキル</li><li data-step="3">指示文</li><li data-step="4">採点</li><li data-step="5">実行</li><li data-step="6">クイズ</li>
+    </ol>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="mockBanner" class="mockbanner" hidden>デモモードで動いています（Gemini ではなく固定ルールの疑似応答です）。</div>
+  <div id="error" class="error" role="alert" hidden></div>
+
+  <section id="s1" class="card">
+    <h2>1. AIでやってみたいことは何ですか</h2>
+    <p class="hint">例：「来月の清掃活動のお知らせを、住民向けに書きたい」</p>
+    <label for="goal" class="sr">やりたいこと</label>
+    <textarea id="goal" rows="3" maxlength="200" placeholder="AIにやってほしいことを、ふつうの言葉で書いてください"></textarea>
+    <div class="row"><span class="count" id="goalCount">0 / 120</span></div>
+    <div class="samples" id="samples">
+      <button type="button" class="chip" data-v="来月の清掃活動のお知らせを、住民向けに書きたい">町内会のお知らせ</button>
+      <button type="button" class="chip" data-v="孫の誕生日に送るお祝いのメッセージを考えたい">お祝いのメッセージ</button>
+      <button type="button" class="chip" data-v="病院の予約をキャンセルするお願いの文章を作りたい">予約のキャンセル連絡</button>
+    </div>
+    <p class="notice">名前・住所・電話番号などは入力しないでください。入力した内容は保存しません。</p>
+    <button id="btnPlan" class="primary" type="button">先生に相談する</button>
+  </section>
+
+  <section id="s2" class="card" hidden>
+    <h2>2. 今回身につけたいスキル</h2>
+    <p id="taskLine" class="hint"></p>
+    <div id="riskBox" class="risk" hidden></div>
+    <ul id="skillList" class="skills"></ul>
+    <p id="tip" class="tip"></p>
+    <button id="btnToPrompt" class="primary" type="button">指示文を書いてみる</button>
+  </section>
+
+  <section id="s3" class="card" hidden>
+    <h2>3. AIへの指示文を書いてみましょう</h2>
+    <p class="hint">先ほどのスキルを意識して書きます。うまく書けなくても大丈夫です。</p>
+    <div id="skillRemind" class="remind"></div>
+    <label for="prompt" class="sr">AIへの指示文</label>
+    <textarea id="prompt" rows="7" maxlength="800" placeholder="ここにAIへの指示文を書きます"></textarea>
+    <div class="row"><span class="count" id="promptCount">0 / 600</span></div>
+    <button id="btnReview" class="primary" type="button">採点してもらう</button>
+  </section>
+
+  <section id="s4" class="card" hidden>
+    <h2>4. 採点と改善のヒント</h2>
+    <div id="total" class="total"></div>
+    <ul id="scoreList" class="scores"></ul>
+    <div id="goodBox" class="good" hidden><h3>よかったところ</h3><ul id="goodList"></ul></div>
+    <div id="impBox" class="imp" hidden><h3>直すと良くなる点</h3><ul id="impList"></ul></div>
+    <h3>直した指示文の例</h3>
+    <pre id="improved" class="pre"></pre>
+    <div class="btns">
+      <button id="btnUseImproved" class="secondary" type="button">この例で実行する</button>
+      <button id="btnRunMine" class="primary" type="button">自分の指示文で実行する</button>
+    </div>
+  </section>
+
+  <section id="s5" class="card" hidden>
+    <h2>5. AIに実行させた結果</h2>
+    <pre id="answer" class="pre answer"></pre>
+    <div class="check"><h3>使う前に確かめること</h3><ul id="checkList"></ul></div>
+    <button id="btnQuiz" class="primary" type="button">確認クイズに進む</button>
+  </section>
+
+  <section id="s6" class="card" hidden>
+    <h2>6. 確認クイズ</h2>
+    <div id="quiz"></div>
+    <div id="quizDone" class="done" hidden></div>
+    <button id="btnRestart" class="secondary" type="button" hidden>最初からやりなおす</button>
+  </section>
+
+  <section id="traceCard" class="card slim" hidden>
+    <details>
+      <summary>先生（エージェント）の判断ログを見る</summary>
+      <p class="hint">この画面で何が判定され、どこで安全のしくみが働いたかの記録です。入力した本文は記録しません。</p>
+      <ol id="traceList" class="trace"></ol>
+    </details>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <p>AIの答えには間違いが含まれることがあります。大切な内容は、必ず自分で確かめてください。</p>
+  <p>入力内容は保存しません。Gemini（Google Cloud）に送って回答を作ります。</p>
+</footer>
+<script src="/static/app.js"></script>
+</body>
+</html>

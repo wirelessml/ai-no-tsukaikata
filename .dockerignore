@@ -1,0 +1,10 @@
+.venv
+.git
+tests
+submission
+scripts
+__pycache__
+*.pyc
+.env*
+deploy.sh
+README.md

@@ -110,7 +110,7 @@ gcloud billing accounts list          # 請求先アカウントIDを確認
 BILLING_ACCOUNT_ID=XXXXXX-XXXXXX-XXXXXX ./deploy.sh
 ```
 
-`deploy.sh` は次を行います：プロジェクト作成、請求先の紐づけ、API有効化（run / aiplatform / cloudbuild / artifactregistry）、実行用サービスアカウントの作成と権限付与、`gcloud run deploy --source .`、URLの表示と `/healthz` の確認。
+`deploy.sh` は次を行います：プロジェクト作成、請求先の紐づけ、API有効化（run / aiplatform / cloudbuild / artifactregistry）、実行用サービスアカウントの作成と権限付与、`gcloud run deploy --source .`、URLの表示と `/api/health` の確認。
 
 中身は次のコマンドと同じです：
 
@@ -157,7 +157,7 @@ gcloud run deploy ai-no-tsukaikata \
 API を直接確認する場合：
 
 ```bash
-curl -s https://<デプロイURL>/healthz
+curl -s https://<デプロイURL>/api/health
 curl -s -X POST https://<デプロイURL>/api/plan -H 'Content-Type: application/json' \
   -d '{"goal":"来月の清掃活動のお知らせを、住民向けに書きたい"}'
 ```

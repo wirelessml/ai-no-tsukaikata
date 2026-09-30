@@ -17,6 +17,7 @@ def client():
 
 def test_health_and_index(client):
     assert client.get("/healthz").json() == {"status": "ok"}
+    assert client.get("/api/health").json() == {"status": "ok"}
     r = client.get("/")
     assert r.status_code == 200 and "AIの使い方を教えます" in r.text
     assert r.headers["x-content-type-options"] == "nosniff"

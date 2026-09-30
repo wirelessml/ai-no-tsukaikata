@@ -72,7 +72,7 @@ def main():
     with sync_playwright() as p:
         b = p.chromium.launch(executable_path="/usr/bin/google-chrome", args=["--no-sandbox"])
         ctx = b.new_context(viewport={"width": 1280, "height": 720}, record_video_dir=str(tmp),
-                            record_video_size={"width": 1280, "height": 720}, locale="ja-JP")
+                            record_video_size={"width": 1280, "height": 720}, locale="ja-JP", bypass_csp=True)
         pg = ctx.new_page()
         t0 = time.monotonic()
         pg.goto(BASE); pg.wait_for_timeout(800)
@@ -105,9 +105,13 @@ def main():
             pg.click("#btnRunMine"); wait("#s5:not([hidden])")
             pg.wait_for_function("document.querySelector('#answer').textContent.length>5", timeout=90000)
         def a_quiz():
-            pg.click("#btnQuiz"); wait(".q")
-            for q in pg.query_selector_all(".q"):
-                pg.wait_for_timeout(1200); q.query_selector_all(".opt")[0].click()
+            with pg.expect_response(lambda r: r.url.endswith("/api/quiz")) as ri:
+                pg.click("#btnQuiz")
+            ans = [q["answer_index"] for q in ri.value.json()["questions"]]
+            wait(".q")
+            for i, q in enumerate(pg.query_selector_all(".q")):
+                pick = ans[i] if i != 1 else (ans[i] + 1) % 3  # 2問は正解、1問はわざと外して解説を見せる
+                pg.wait_for_timeout(1200); q.query_selector_all(".opt")[pick].click()
         def a_trace():
             pg.evaluate("document.querySelector('#traceCard details').open = true")
             pg.evaluate("document.getElementById('traceCard').scrollIntoView({block:'center'})")

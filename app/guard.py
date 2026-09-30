@@ -22,7 +22,7 @@ _CARD = re.compile(r"(?<!\d)(?:\d[ -]?){13,16}(?!\d)")
 _INJECTION_PATTERNS: list[re.Pattern[str]] = [
     re.compile(p, re.IGNORECASE)
     for p in [
-        r"(以前|これまで|上記|前)の(指示|命令|ルール|プロンプト)を(すべて|全て)?(無視|忘れ|破棄)",
+        r"(以前|これまで|上記|前)の(指示|命令|ルール|プロンプト)(を|は|も)(すべて|全て)?(無視|忘れ|破棄)",
         r"(指示|命令|ルール)を(すべて|全て)?(無視|忘れて)",
         r"システム(プロンプト|メッセージ|指示)を(表示|出力|教え|見せ)",
         r"ignore (all |any )?(the )?(previous|prior|above) (instructions|prompts?|rules)",

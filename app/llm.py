@@ -69,10 +69,14 @@ class GeminiLLM:
             thinking_config=self._thinking(),
             http_options=types.HttpOptions(timeout=config.LLM_TIMEOUT_MS),
         )
-        try:
-            resp = self.client.models.generate_content(model=config.GEMINI_MODEL, contents=user, config=cfg)
-        except Exception as e:  # ネットワーク・権限・クォータなど
-            raise LLMError(f"{type(e).__name__}") from e
+        resp = None
+        for attempt in range(2):  # 遅い応答（まれに30秒超）に備えて、短い待ち時間で1回だけやり直す
+            try:
+                resp = self.client.models.generate_content(model=config.GEMINI_MODEL, contents=user, config=cfg)
+                break
+            except Exception as e:  # ネットワーク・権限・クォータなど
+                if attempt == 1:
+                    raise LLMError(f"{type(e).__name__}") from e
         text = (resp.text or "").strip()
         text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)
         try:

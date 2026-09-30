@@ -76,6 +76,7 @@ def _limit(request: Request) -> None:
 
 
 @app.get("/healthz")
+@app.get("/api/health")  # Cloud Run の *.run.app では /healthz が Google 側で 404 になる。こちらを使う
 def healthz():
     return {"status": "ok"}
 

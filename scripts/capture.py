@@ -36,10 +36,12 @@ def flow(page, tag, *, shots):
     page.click("#btnRunMine"); page.wait_for_selector("#s5:not([hidden])"); page.wait_for_function("document.querySelector('#answer').textContent.length>5")
     page.wait_for_timeout(600)
     if "run" in shots: page.screenshot(path=str(OUT / f"{tag}-5-run.png"), full_page=True)
-    page.click("#btnQuiz"); page.wait_for_selector("#s6:not([hidden])"); page.wait_for_selector(".q")
-    qs = page.query_selector_all(".q")
-    for i, q in enumerate(qs):
-        q.query_selector_all(".opt")[0 if i != 1 else 1].click()
+    with page.expect_response(lambda r: r.url.endswith("/api/quiz")) as ri:
+        page.click("#btnQuiz")
+    ans = [q["answer_index"] for q in ri.value.json()["questions"]]
+    page.wait_for_selector("#s6:not([hidden])"); page.wait_for_selector(".q")
+    for i, q in enumerate(page.query_selector_all(".q")):
+        q.query_selector_all(".opt")[ans[i] if i != 1 else (ans[i] + 1) % 3].click()  # 2問は正解、1問はわざと外す
     page.wait_for_timeout(600)
     if "quiz" in shots: page.screenshot(path=str(OUT / f"{tag}-6-quiz.png"), full_page=True)
     page.evaluate("document.querySelector('#traceCard details').open = true")
@@ -50,14 +52,14 @@ def flow(page, tag, *, shots):
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path="/usr/bin/google-chrome", args=["--no-sandbox"])
     # デスクトップ
-    ctx = b.new_context(viewport={"width": 1100, "height": 900}, locale="ja-JP")
+    ctx = b.new_context(viewport={"width": 1100, "height": 900}, locale="ja-JP", bypass_csp=True)
     pg = ctx.new_page()
     pg.goto(BASE); pg.wait_for_timeout(500)
     pg.screenshot(path=str(OUT / "desktop-1-top.png"))
     flow(pg, "desktop", shots={"plan", "review", "run", "quiz", "trace"})
     ctx.close()
     # スマホ
-    ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="ja-JP")
+    ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="ja-JP", bypass_csp=True)
     pg = ctx.new_page()
     pg.goto(BASE); pg.wait_for_timeout(500)
     pg.screenshot(path=str(OUT / "mobile-1-top.png"))

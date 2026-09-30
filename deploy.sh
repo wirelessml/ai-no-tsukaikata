@@ -109,7 +109,7 @@ fi
 
 echo
 echo "== 動作確認"
-curl -fsS "${URL}/healthz" && echo
+curl -fsS "${URL}/api/health" && echo
 echo
 echo "デプロイ完了: ${URL}"
 echo "次の一歩: ブラウザで開き、README の「動作確認の方法」に沿って試す。撮り直しは:"

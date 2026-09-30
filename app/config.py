@@ -23,7 +23,7 @@ MAX_PROMPT_CHARS = _int("MAX_PROMPT_CHARS", 600)
 MAX_TEXT_CHARS = _int("MAX_TEXT_CHARS", 1500)  # 実行結果などをクイズに渡すときの上限
 
 # 出力上限（トークン）
-MAX_OUTPUT_TOKENS = _int("MAX_OUTPUT_TOKENS", 1200)
+MAX_OUTPUT_TOKENS = _int("MAX_OUTPUT_TOKENS", 2048)
 
 # 濫用対策
 RATE_LIMIT_REQUESTS = _int("RATE_LIMIT_REQUESTS", 30)   # 窓内に許可するAPI呼び出し数（IPごと）

@@ -4,7 +4,7 @@ AIを初めて使う人のための、対話式の練習アプリです。「AI�
 
 「第5回 Agentic AI Hackathon with Google Cloud」（Zenn）への提出作品です。Cloud Run 上で動き、Gemini を Google Gen AI SDK（Vertex AI モード）から呼びます。
 
-- 作った動機：2026年10月1日に、神戸の公民館で初心者向けのAI講座を担当します。講座の中で「AIに何をどう頼めばいいか」でつまずく人が多いと考え、講座の後に一人でも練習を続けられる道具として作りました。
+- 作った動機：2026年10月1日に、神戸の公民館で初心者向けのAI講座を担当します。講座で聞いた内容を、その場で終わらせず、帰ってからも一人で練習できる道具として作りました。
 - 対象：AIを使ったことがない、または使ってみたが思うような答えが返ってこない大人（高齢の方を含む）。
 - 費用：Cloud Run は使った分だけの課金で、待機中は 0 インスタンスです（`--min-instances 0`）。Gemini は Vertex AI の従量課金です。
 
@@ -133,7 +133,7 @@ gcloud run deploy ai-no-tsukaikata \
 | `GEMINI_API_KEY` | なし | ローカル確認用。設定すると Gemini API を使う |
 | `THINKING_LEVEL` | `LOW` | `MINIMAL` `LOW` `MEDIUM` `HIGH` `OFF` |
 | `MAX_GOAL_CHARS` / `MAX_PROMPT_CHARS` | 120 / 600 | 入力の文字数上限 |
-| `MAX_OUTPUT_TOKENS` | 1200 | Gemini の出力上限 |
+| `MAX_OUTPUT_TOKENS` | 2048 | Gemini の出力上限 |
 | `RATE_LIMIT_REQUESTS` / `RATE_LIMIT_WINDOW_SEC` | 30 / 600 | IPごとのレート制限 |
 | `DAILY_LLM_CALL_LIMIT` | 2000 | インスタンスごとの1日あたり Gemini 呼び出し上限 |
 

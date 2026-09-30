@@ -1,0 +1,70 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0}
+body{width:1920px;height:1080px;background:#f7f9f8;font-family:"Noto Sans CJK JP","Noto Sans JP",sans-serif;color:#1f2933;position:relative;overflow:hidden}
+h1{position:absolute;left:60px;top:30px;font-size:40px;letter-spacing:.02em}
+.sub{position:absolute;left:62px;top:88px;font-size:22px;color:#52606d}
+.box{position:absolute;border-radius:18px;background:#fff;border:3px solid #cbd5e1;padding:18px 22px}
+.box h3{font-size:24px;margin-bottom:8px;color:#084c37}
+.box p,.box li{font-size:20px;line-height:1.55;color:#334155}
+.box ul{padding-left:22px}
+.gc{position:absolute;left:520px;top:150px;width:1340px;height:880px;border-radius:26px;background:#eaf3ff;border:4px dashed #4285f4}
+.gclabel{position:absolute;left:548px;top:160px;font-size:24px;font-weight:700;color:#1a56b8}
+.run{position:absolute;left:560px;top:205px;width:800px;height:790px;border-radius:22px;background:#fff;border:4px solid #0b6e4f}
+.runlabel{position:absolute;left:585px;top:215px;font-size:26px;font-weight:700;color:#0b6e4f}
+.step{position:absolute;width:172px;height:100px;border-radius:14px;background:#e8f4ef;border:3px solid #0b6e4f;text-align:center;padding-top:12px;font-size:21px;font-weight:700;color:#084c37;line-height:1.35}
+.step small{display:block;font-size:16px;font-weight:400;color:#334155;margin-top:2px}
+.guard{background:#fff7e6;border-color:#b45309}.guard h3{color:#92400e}
+.vertex{background:#fff;border-color:#4285f4}.vertex h3{color:#1a56b8}
+.log{background:#fff;border-color:#4285f4}.log h3{color:#1a56b8}
+.user{background:#fff;border-color:#64748b}
+.tag{position:absolute;font-size:18px;color:#475569;background:#f7f9f8;padding:0 6px;font-weight:600}
+svg{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none}
+</style></head><body>
+<h1>AIの使い方を教えます　システム構成図</h1>
+<div class="sub">Cloud Run 上の FastAPI が、講師エージェントの4段階で Gemini（Vertex AI）を呼び出す。入力は保存しない。</div>
+
+<div class="box user" style="left:60px;top:300px;width:380px;height:300px">
+<h3>学習者（スマホ / PC）</h3>
+<ul><li>ブラウザで画面を開く</li><li>やりたいことを1行入力</li><li>指示文を書く</li><li>採点・実行・クイズを見る</li></ul>
+</div>
+<div class="box" style="left:60px;top:680px;width:380px;height:210px;border-color:#94a3b8">
+<h3>入力しないもの</h3><p>氏名・住所・電話番号など。入力欄で注意を出し、コードでも検出して止める。</p></div>
+
+<div class="gc"></div><div class="gclabel">Google Cloud（asia-northeast1 ほか）</div>
+<div class="run"></div><div class="runlabel">Cloud Run：FastAPI コンテナ（max-instances 2 / 512Mi）</div>
+
+<div class="box" style="left:590px;top:265px;width:300px;height:215px"><h3>静的画面</h3><p>HTML / CSS / JS<br>大きめの文字・スマホ対応<br>判断ログの表示</p></div>
+<div class="box guard" style="left:920px;top:265px;width:410px;height:215px"><h3>入力ガード・制限</h3>
+<ul><li>個人情報らしき文字列</li><li>指示の上書きを狙う文</li><li>文字数の上限</li><li>IPごとのレート制限</li><li>1日の呼び出し上限</li></ul></div>
+
+<div style="position:absolute;left:590px;top:515px;font-size:22px;font-weight:700;color:#084c37">講師エージェント（app/agent.py）</div>
+<div class="step" style="left:590px;top:560px">1 計画<small>可否・リスク・スキル選定</small></div>
+<div class="step" style="left:790px;top:560px">2 採点<small>スキル別に◎△×</small></div>
+<div class="step" style="left:990px;top:560px">3 実行<small>結果＋確認点</small></div>
+<div class="step" style="left:1190px;top:560px">4 クイズ<small>弱点を優先</small></div>
+
+<div class="box" style="left:590px;top:700px;width:380px;height:265px;border-color:#0b6e4f"><h3>コードによる制御</h3>
+<ul><li>スキルは固定カタログのIDだけ</li><li>出力はJSONスキーマで受け取り検証</li><li>不正ならフォールバック（既定スキル・固定クイズ）</li></ul></div>
+<div class="box" style="left:990px;top:700px;width:370px;height:265px;border-color:#0b6e4f"><h3>出力の安全策</h3>
+<ul><li>個人情報らしき文字列を伏せる</li><li>医療・法律・お金は注意書きを追加</li><li>DB なし・入力は保存しない</li></ul></div>
+
+<div class="box vertex" style="left:1440px;top:265px;width:380px;height:400px"><h3>Vertex AI（Gemini）</h3>
+<ul><li>gemini-3.5-flash</li><li>Google Gen AI SDK<br>（vertexai=True）</li><li>構造化出力（JSON）</li><li>認証は ADC のみ（キー不要）</li></ul></div>
+<div class="box" style="left:1440px;top:695px;width:380px;height:130px;border-color:#4285f4"><h3>IAM</h3><p>実行用サービスアカウントに<br>roles/aiplatform.user のみ付与</p></div>
+<div class="box log" style="left:1440px;top:850px;width:380px;height:150px"><h3>Cloud Logging</h3><p>構造化ログ。ステップ名・所要時間・トークン数のみ。本文は出さない</p></div>
+
+<svg viewBox="0 0 1920 1080">
+<defs><marker id="a" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#334155"/></marker></defs>
+<g stroke="#334155" stroke-width="4" fill="none" marker-end="url(#a)">
+<path d="M440,420 L585,420"/>
+<path d="M890,372 L915,372"/>
+<path d="M1125,482 L1125,520 L676,520 L676,556" />
+<path d="M1362,610 L1436,610"/>
+<path d="M1362,925 L1436,925" stroke-dasharray="8 6"/>
+
+</g>
+<path d="M776,610 L790,610 M962,610 L990,610 M1162,610 L1190,610" stroke="#0b6e4f" stroke-width="4" fill="none" marker-end="url(#a)"/>
+</svg>
+<div class="tag" style="left:462px;top:388px">HTTPS</div>
+<div class="tag" style="left:1230px;top:672px;font-size:17px;width:200px;text-align:center;line-height:1.3;background:transparent">全4段階で<br>Gemini を呼ぶ</div><div class="tag" style="left:1364px;top:892px;font-size:16px;background:transparent">ログ</div>
+</body></html>
